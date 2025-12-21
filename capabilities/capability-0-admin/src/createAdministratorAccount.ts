@@ -12,7 +12,11 @@ import {
 } from "./stores";
 
 import { AdministratorIdentity } from "./types";
-import { UnauthenticatedAdminError, ReplayRequestDetectedError } from "./errors";
+import {
+  UnauthenticatedAdminError,
+  ReplayRequestDetectedError,
+} from "./errors";
+import { IdGenerator } from "./idGenerator";
 
 export function createAdministratorAccount(
   actorAdminId: string | undefined,
@@ -21,11 +25,12 @@ export function createAdministratorAccount(
   now: Date,
   identityStore: AdministratorIdentityStore,
   auditLogStore: AuditLogStore,
-  requestRegistry: ProcessedRequestRegistry
+  requestRegistry: ProcessedRequestRegistry,
+  idGenerator: IdGenerator
 ): void {
   if (!actorAdminId) {
     auditLogStore.append({
-      auditId: crypto.randomUUID(),
+      auditId: idGenerator.nextId(),
       timestamp: now,
       actorAdminId: "UNKNOWN",
       action: "CREATE_ADMIN",
@@ -41,7 +46,7 @@ export function createAdministratorAccount(
 
   if (requestRegistry.has(requestId)) {
     auditLogStore.append({
-      auditId: crypto.randomUUID(),
+      auditId: idGenerator.nextId(),
       timestamp: now,
       actorAdminId,
       action: "CREATE_ADMIN",
@@ -64,7 +69,7 @@ export function createAdministratorAccount(
   };
 
   auditLogStore.append({
-    auditId: crypto.randomUUID(),
+    auditId: idGenerator.nextId(),
     timestamp: now,
     actorAdminId,
     action: "CREATE_ADMIN",
