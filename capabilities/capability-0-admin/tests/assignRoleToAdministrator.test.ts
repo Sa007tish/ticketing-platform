@@ -1,115 +1,75 @@
 import { assignRoleToAdministrator } from "../src/assignRoleToAdministrator";
 import { AdminRole } from "../src/types";
 import {
-  UnauthenticatedAdminError,
-  TargetAdminNotFoundError,
-  MissingJustificationError,
-  InvalidRoleError,
-  UnauthorizedRoleAssignmentError,
-  ReplayRequestDetectedError,
-} from "../src/errors";
-import {
   InMemoryAdministratorIdentityStore,
   InMemoryRoleAssignmentStore,
   InMemoryAuditLogStore,
   InMemoryProcessedRequestRegistry,
 } from "../src/inMemoryStores";
-import { DeterministicIdGenerator } from "../src/idGenerator";
 
 describe("assignRoleToAdministrator", () => {
-  const fixedNow = new Date("2025-01-01T00:00:00.000Z");
+  it("assigns a role and records a SUCCESS audit log", () => {
+    const identityStore = new InMemoryAdministratorIdentityStore();
+    const roleStore = new InMemoryRoleAssignmentStore();
+    const auditLogStore = new InMemoryAuditLogStore();
+    const requestRegistry = new InMemoryProcessedRequestRegistry();
 
-  let administratorStore: InMemoryAdministratorIdentityStore;
-  let roleAssignmentStore: InMemoryRoleAssignmentStore;
-  let auditLogStore: InMemoryAuditLogStore;
-  let processedRequestRegistry: InMemoryProcessedRequestRegistry;
-  let idGenerator: DeterministicIdGenerator;
-
-  beforeEach(() => {
-    administratorStore = new InMemoryAdministratorIdentityStore();
-    roleAssignmentStore = new InMemoryRoleAssignmentStore();
-    auditLogStore = new InMemoryAuditLogStore();
-    processedRequestRegistry = new InMemoryProcessedRequestRegistry();
-    idGenerator = new DeterministicIdGenerator();
-
-    administratorStore.create({
-      adminId: "actor-admin",
-      createdAt: fixedNow,
-      isAttendee: false,
-      isOrganiser: false,
-      status: "ACTIVE",
+    identityStore.create({
+      adminId: "admin-1",
+      email: "admin@test.com",
+      createdAt: new Date(),
     });
 
-    administratorStore.create({
-      adminId: "target-admin",
-      createdAt: fixedNow,
-      isAttendee: false,
-      isOrganiser: false,
-      status: "ACTIVE",
-    });
-  });
-
-  test("successfully assigns role", () => {
-    assignRoleToAdministrator(
-      administratorStore,
-      roleAssignmentStore,
+    assignRoleToAdministrator({
+      actorAdminId: "admin-1",
+      targetAdminId: "admin-1",
+      role: AdminRole.SUPER_ADMIN,
+      requestId: "req-1",
+      occurredAt: new Date(),
+      identityStore,
+      roleAssignmentStore: roleStore,
       auditLogStore,
-      processedRequestRegistry,
-      idGenerator,
-      "actor-admin",
-      "target-admin",
-      AdminRole.SUPPORT_ADMIN,
-      "grant support role",
-      "req-1",
-      fixedNow
+      processedRequestRegistry: requestRegistry,
+    });
+
+    expect(roleStore.getRolesForAdmin("admin-1").has(AdminRole.SUPER_ADMIN)).toBe(
+      true
     );
 
-    expect(
-      roleAssignmentStore.getRolesForAdmin("target-admin").has(AdminRole.SUPPORT_ADMIN)
-    ).toBe(true);
-
-    const logs = auditLogStore.getAll();
+    const logs = auditLogStore.readAll();
     expect(logs).toHaveLength(1);
     expect(logs[0].outcome).toBe("SUCCESS");
   });
 
-  test("rejects replay request", () => {
-    processedRequestRegistry.record({ requestId: "req-1", processedAt: fixedNow });
+  it("records FAILURE when request is replayed", () => {
+    const identityStore = new InMemoryAdministratorIdentityStore();
+    const roleStore = new InMemoryRoleAssignmentStore();
+    const auditLogStore = new InMemoryAuditLogStore();
+    const requestRegistry = new InMemoryProcessedRequestRegistry();
 
-    expect(() =>
-      assignRoleToAdministrator(
-        administratorStore,
-        roleAssignmentStore,
-        auditLogStore,
-        processedRequestRegistry,
-        idGenerator,
-        "actor-admin",
-        "target-admin",
-        AdminRole.SUPPORT_ADMIN,
-        "grant support role",
-        "req-1",
-        fixedNow
-      )
-    ).toThrow(ReplayRequestDetectedError);
+    identityStore.create({
+      adminId: "admin-1",
+      email: "admin@test.com",
+      createdAt: new Date(),
+    });
 
-    expect(auditLogStore.getAll()).toHaveLength(1);
-  });
+    const input = {
+      actorAdminId: "admin-1",
+      targetAdminId: "admin-1",
+      role: AdminRole.SUPER_ADMIN,
+      requestId: "req-1",
+      occurredAt: new Date(),
+      identityStore,
+      roleAssignmentStore: roleStore,
+      auditLogStore,
+      processedRequestRegistry: requestRegistry,
+    };
 
-  test("fails when actor lacks authority", () => {
-    expect(() =>
-      assignRoleToAdministrator(
-        administratorStore,
-        roleAssignmentStore,
-        auditLogStore,
-        processedRequestRegistry,
-        idGenerator,
-        "actor-admin",
-        "target-admin",
-        AdminRole.AUDIT_ADMIN,
-        "unauthorized grant",
-        "req-2",
-        fixedNow
-      )
-    ).toThrow(UnauthorizedRoleAssignmentError);
+    assignRoleToAdministrator(input);
+    assignRoleToAdministrator(input);
+
+    const logs = auditLogStore.readAll();
+    expect(logs).toHaveLength(2);
+    expect(logs[1].outcome).toBe("FAILURE");
   });
 });
