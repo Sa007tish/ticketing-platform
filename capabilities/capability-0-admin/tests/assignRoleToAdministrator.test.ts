@@ -1,5 +1,5 @@
-import { assignRoleToAdministrator } from "../assignRoleToAdministrator";
-import { AdminRole } from "../types";
+import { assignRoleToAdministrator } from "../src/assignRoleToAdministrator";
+import { AdminRole } from "../src/types";
 import {
   UnauthenticatedAdminError,
   TargetAdminNotFoundError,
@@ -7,14 +7,14 @@ import {
   InvalidRoleError,
   UnauthorizedRoleAssignmentError,
   ReplayRequestDetectedError,
-} from "../errors";
+} from "../src/errors";
 import {
   InMemoryAdministratorIdentityStore,
   InMemoryRoleAssignmentStore,
   InMemoryAuditLogStore,
   InMemoryProcessedRequestRegistry,
-} from "../inMemoryStores";
-import { DeterministicIdGenerator } from "../idGenerator";
+} from "../src/inMemoryStores";
+import { DeterministicIdGenerator } from "../src/idGenerator";
 
 describe("assignRoleToAdministrator", () => {
   const fixedNow = new Date("2025-01-01T00:00:00.000Z");
