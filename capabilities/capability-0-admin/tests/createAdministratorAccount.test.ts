@@ -79,4 +79,49 @@ describe("createAdministratorAccount", () => {
     // Replay registry updated
     expect(requestRegistry.has("req-2")).toBe(true);
   });
+
+  test("rejects replayed requestId and logs failure without mutating state", () => {
+    const identityStore = new InMemoryAdministratorIdentityStore();
+    const auditLogStore = new InMemoryAuditLogStore();
+    const requestRegistry = new InMemoryProcessedRequestRegistry();
+    const idGenerator = new DeterministicIdGenerator();
+
+    // First call succeeds
+    createAdministratorAccount(
+      "admin-1",
+      "req-replay",
+      "new-admin",
+      now,
+      identityStore,
+      auditLogStore,
+      requestRegistry,
+      idGenerator
+    );
+
+    // Second call with same requestId should fail
+    expect(() =>
+      createAdministratorAccount(
+        "admin-1",
+        "req-replay",
+        "another-admin",
+        now,
+        identityStore,
+        auditLogStore,
+        requestRegistry,
+        idGenerator
+      )
+    ).toThrowError();
+
+    // No second identity created
+    expect(identityStore.getById("another-admin")).toBeUndefined();
+
+    // Audit logs: one SUCCESS, one FAILURE
+    const logs = auditLogStore.readAll();
+    expect(logs).toHaveLength(2);
+    expect(logs[0].outcome).toBe("SUCCESS");
+    expect(logs[1].outcome).toBe("FAILURE");
+
+    // Replay registry still contains the requestId
+    expect(requestRegistry.has("req-replay")).toBe(true);
+  });
 });
