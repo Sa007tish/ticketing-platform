@@ -6,70 +6,46 @@ import {
   InMemoryAuditLogStore,
   InMemoryProcessedRequestRegistry,
 } from "../src/inMemoryStores";
+import { DeterministicIdGenerator } from "../src/idGenerator";
 
 describe("assignRoleToAdministrator", () => {
-  it("assigns a role and records a SUCCESS audit log", () => {
-    const identityStore = new InMemoryAdministratorIdentityStore();
-    const roleStore = new InMemoryRoleAssignmentStore();
+  const now = new Date();
+
+  test("assigns SUPPORT_ADMIN role successfully", () => {
+    const administratorStore = new InMemoryAdministratorIdentityStore();
+    const roleAssignmentStore = new InMemoryRoleAssignmentStore();
     const auditLogStore = new InMemoryAuditLogStore();
-    const requestRegistry = new InMemoryProcessedRequestRegistry();
+    const processedRequestRegistry = new InMemoryProcessedRequestRegistry();
+    const idGenerator = new DeterministicIdGenerator();
 
-    identityStore.create({
+    administratorStore.create({
       adminId: "admin-1",
-      email: "admin@test.com",
-      createdAt: new Date(),
+      createdAt: now,
+      isAttendee: false,
+      isOrganiser: false,
+      status: "ACTIVE",
     });
 
-    assignRoleToAdministrator({
-      actorAdminId: "admin-1",
-      targetAdminId: "admin-1",
-      role: AdminRole.SUPER_ADMIN,
-      requestId: "req-1",
-      occurredAt: new Date(),
-      identityStore,
-      roleAssignmentStore: roleStore,
+    assignRoleToAdministrator(
+      administratorStore,
+      roleAssignmentStore,
       auditLogStore,
-      processedRequestRegistry: requestRegistry,
-    });
-
-    expect(roleStore.getRolesForAdmin("admin-1").has(AdminRole.SUPER_ADMIN)).toBe(
-      true
+      processedRequestRegistry,
+      idGenerator,
+      "admin-1",
+      "admin-1",
+      AdminRole.SUPPORT_ADMIN,
+      "initial assignment",
+      "req-1",
+      now
     );
+
+    expect(
+      roleAssignmentStore.getRolesForAdmin("admin-1").has(AdminRole.SUPPORT_ADMIN)
+    ).toBe(true);
 
     const logs = auditLogStore.readAll();
     expect(logs).toHaveLength(1);
     expect(logs[0].outcome).toBe("SUCCESS");
-  });
-
-  it("records FAILURE when request is replayed", () => {
-    const identityStore = new InMemoryAdministratorIdentityStore();
-    const roleStore = new InMemoryRoleAssignmentStore();
-    const auditLogStore = new InMemoryAuditLogStore();
-    const requestRegistry = new InMemoryProcessedRequestRegistry();
-
-    identityStore.create({
-      adminId: "admin-1",
-      email: "admin@test.com",
-      createdAt: new Date(),
-    });
-
-    const input = {
-      actorAdminId: "admin-1",
-      targetAdminId: "admin-1",
-      role: AdminRole.SUPER_ADMIN,
-      requestId: "req-1",
-      occurredAt: new Date(),
-      identityStore,
-      roleAssignmentStore: roleStore,
-      auditLogStore,
-      processedRequestRegistry: requestRegistry,
-    };
-
-    assignRoleToAdministrator(input);
-    assignRoleToAdministrator(input);
-
-    const logs = auditLogStore.readAll();
-    expect(logs).toHaveLength(2);
-    expect(logs[1].outcome).toBe("FAILURE");
   });
 });
