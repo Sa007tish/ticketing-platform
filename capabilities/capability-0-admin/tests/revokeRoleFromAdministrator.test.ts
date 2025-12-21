@@ -1,6 +1,5 @@
-```ts
-import { revokeRoleFromAdministrator } from "../revokeRoleFromAdministrator";
-import { AdminRole } from "../types";
+import { revokeRoleFromAdministrator } from "../src/revokeRoleFromAdministrator";
+import { AdminRole } from "../src/types";
 import {
   UnauthenticatedAdminError,
   TargetAdminNotFoundError,
@@ -9,14 +8,14 @@ import {
   UnauthorizedRoleAssignmentError,
   ReplayRequestDetectedError,
   LastAuditAdminRemovalError,
-} from "../errors";
+} from "../src/errors";
 import {
   InMemoryAdministratorIdentityStore,
   InMemoryRoleAssignmentStore,
   InMemoryAuditLogStore,
   InMemoryProcessedRequestRegistry,
 } from "../src/inMemoryStores";
-import { DeterministicIdGenerator } from "../idGenerator";
+import { DeterministicIdGenerator } from "../src/idGenerator";
 
 describe("revokeRoleFromAdministrator", () => {
   const fixedNow = new Date("2025-01-01T00:00:00.000Z");
@@ -285,4 +284,3 @@ describe("revokeRoleFromAdministrator", () => {
     ).toBe(true);
   });
 });
-```
