@@ -3,7 +3,7 @@
 import { registerUser } from "../registerUser";
 import { User, UserId } from "../types";
 import { UserStore } from "../stores";
-import { DeterministicIdGenerator } from "../../../capability-0-admin/src/idGenerator";
+import { DeterministicIdGenerator } from "../../capability-0-admin/src/idGenerator";
 
 const NOW = new Date("2024-01-01T00:00:00.000Z");
 
