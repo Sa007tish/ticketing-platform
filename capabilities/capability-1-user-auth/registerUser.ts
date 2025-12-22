@@ -18,15 +18,19 @@ export function registerUser(
   userStore: UserStore,
   idGenerator: IdGenerator
 ): RegisterUserResult {
-  const userId = idGenerator.nextId();
+  // ✅ HARDENING GUARD — required input validation
+  if (!(input?.now instanceof Date)) {
+    throw new Error("Invalid input: now must be a Date");
+  }
 
+  const userId = idGenerator.nextId();
   const authenticationSecret = `secret-${userId}`;
 
   const user: User = {
-  userId,
-  createdAt: input.now,
-  authenticationSecret,
-};
+    userId,
+    createdAt: input.now,
+    authenticationSecret,
+  };
 
   userStore.create(user);
 
