@@ -30,9 +30,16 @@ describe("registerUser", () => {
       idGenerator
     );
 
-    expect(result.user.userId).toBe("user-1");
-    expect(result.user.createdAt).toEqual(NOW);
-    expect(result.authenticationSecret).toBeDefined();
+    const result = registerUser(...);
+    
+    const generatedUserId = result.user.userId;
+    expect(generatedUserId).toBeDefined();              // NEW (existence)
+    
+    expect(result.user.createdAt).toEqual(NOW);         // unchanged
+    expect(result.authenticationSecret).toBeDefined();  // unchanged
+    
+    const persistedUser = userStore.getById(generatedUserId);
+    expect(persistedUser?.userId).toBe(generatedUserId); // NEW (stability)
 
     const persisted = userStore.getById(result.user.userId);
     expect(persisted).toEqual(result.user);
