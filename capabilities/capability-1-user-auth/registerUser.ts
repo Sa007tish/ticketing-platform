@@ -2,7 +2,7 @@
 
 import { User } from "./types";
 import { UserStore } from "./stores";
-import { IdGenerator } from "../capability-0-admin/idGenerator";
+import { IdGenerator } from "../../capability-0-admin/idGenerator";
 
 export interface RegisterUserInput {
   now: Date;
@@ -17,4 +17,21 @@ export function registerUser(
   input: RegisterUserInput,
   userStore: UserStore,
   idGenerator: IdGenerator
-): RegisterUserResult;
+): RegisterUserResult {
+  const userId = idGenerator.nextId();
+
+  const authenticationSecret = `secret-${userId}`;
+
+  const user: User = {
+    userId,
+    createdAt: input.now,
+    authenticationSecret,
+  };
+
+  userStore.create(user);
+
+  return {
+    user,
+    authenticationSecret,
+  };
+}
