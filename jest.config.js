@@ -1,6 +1,9 @@
-module.exports = {
+export default {
   preset: "ts-jest",
   testEnvironment: "node",
   roots: ["<rootDir>/capabilities"],
-  testMatch: ["**/tests/**/*.test.ts"]
+  testMatch: [
+    "**/tests/**/*.test.ts",
+    "**/hardening/**/*.test.ts"
+  ],
 };
