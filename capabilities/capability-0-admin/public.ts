@@ -8,35 +8,18 @@
  */
 
 // =====================
-// Decisions (Read-only)
-// =====================
-
-export { authorizeAdminAction } from "./src/authorizeAdminAction";
-
-// =====================
 // Infrastructure
 // =====================
 
-export { DeterministicIdGenerator } from "./src/idGenerator";
-
-// =====================
-// Types (Read-only)
-// =====================
-
-export type {
-  AdminId,
-  AdminRole,
-  ActorContext,
-} from "./src/types";
-
 export type { IdGenerator } from "./src/idGenerator";
+export { DeterministicIdGenerator } from "./src/idGenerator";
 
 // =====================
 // Errors (Read-only)
 // =====================
 
 export {
-  UnauthorizedError,
-  UnauthenticatedError,
-  ReplayDetectedError,
+  UnauthenticatedAdminError,
+  UnauthorizedAdminActionError,
+  ReplayDetectedAdminActionError,
 } from "./src/errors";
