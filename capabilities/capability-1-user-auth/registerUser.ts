@@ -1,6 +1,6 @@
 // capabilities/capability-1-user-auth/registerUser.ts
 
-import { User } from "./types";
+import { User, UserId } from "./types";
 import { UserStore } from "./stores";
 import { IdGenerator } from "../capability-0-admin/src/idGenerator";
 
@@ -18,13 +18,14 @@ export function registerUser(
   userStore: UserStore,
   idGenerator: IdGenerator
 ): RegisterUserResult {
-  const userId = idGenerator.nextId() as UserId;
+  const userId = idGenerator.nextId();
 
   const authenticationSecret = `secret-${userId}`;
 
   const user: User = {
   userId,
   createdAt: input.now,
+  authenticationSecret,
 };
 
   userStore.create(user);
