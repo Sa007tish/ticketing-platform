@@ -1,47 +1,56 @@
 import { assignRoleToAdministrator } from "../src/assignRoleToAdministrator";
-import { AdminRole } from "../src/types";
 import {
   InMemoryAdministratorIdentityStore,
   InMemoryRoleAssignmentStore,
   InMemoryAuditLogStore,
   InMemoryProcessedRequestRegistry,
 } from "../src/inMemoryStores";
-import { DeterministicIdGenerator } from "../src/idGenerator";
+import { AdminRole } from "../src/types";
+
+const fixedNow = new Date("2025-01-01T00:00:00Z");
 
 describe("assignRoleToAdministrator", () => {
-  const now = new Date();
-
-  test("assigns SUPPORT_ADMIN role successfully", () => {
+  it("assigns a role when invoked by an authorized admin", () => {
     const administratorStore = new InMemoryAdministratorIdentityStore();
-    const roleAssignmentStore = new InMemoryRoleAssignmentStore();
+    const roleStore = new InMemoryRoleAssignmentStore();
     const auditLogStore = new InMemoryAuditLogStore();
-    const processedRequestRegistry = new InMemoryProcessedRequestRegistry();
-    const idGenerator = new DeterministicIdGenerator();
+    const processedRegistry = new InMemoryProcessedRequestRegistry();
+
+    const idGenerator = { nextId: () => "audit-1" };
 
     administratorStore.create({
-      adminId: "admin-1",
-      createdAt: now,
-      isAttendee: false,
-      isOrganiser: false,
-      status: "ACTIVE",
+      adminId: "actor-admin",
+      createdAt: fixedNow,
+    });
+
+    administratorStore.create({
+      adminId: "target-admin",
+      createdAt: fixedNow,
+    });
+
+    roleStore.assign({
+      adminId: "actor-admin",
+      role: AdminRole.SUPPORT_ADMIN,
+      assignedAt: fixedNow,
+      assignedByAdminId: "actor-admin",
     });
 
     assignRoleToAdministrator(
       administratorStore,
-      roleAssignmentStore,
+      roleStore,
       auditLogStore,
-      processedRequestRegistry,
+      processedRegistry,
       idGenerator,
-      "admin-1",
-      "admin-1",
+      "actor-admin",
+      "target-admin",
       AdminRole.SUPPORT_ADMIN,
-      "initial assignment",
+      "Operational requirement",
       "req-1",
-      now
+      fixedNow
     );
 
     expect(
-      roleAssignmentStore.getRolesForAdmin("admin-1").has(AdminRole.SUPPORT_ADMIN)
+      roleStore.getRolesForAdmin("target-admin").has(AdminRole.SUPPORT_ADMIN)
     ).toBe(true);
 
     const logs = auditLogStore.readAll();
