@@ -13,13 +13,10 @@ test("failed authentication does not mutate stores", () => {
 
   const userStore = new InMemoryUserStore();
   const authenticationStore = new InMemoryAuthenticationStore();
-  const idGenerator = new DeterministicIdGenerator([
-    "id-1",
-    "id-2",
-    "id-3",
-  ]);
+  const idGenerator = new DeterministicIdGenerator(); // ✅ fixed
 
-  const user = registerUser({ now }, userStore, idGenerator);
+  const registration = registerUser({ now }, userStore, idGenerator);
+  const user = registration.user; // ✅ explicit and correct
 
   expect(() =>
     authenticateUser(
