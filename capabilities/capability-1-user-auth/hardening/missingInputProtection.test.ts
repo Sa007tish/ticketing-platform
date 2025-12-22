@@ -7,7 +7,7 @@ import {
   InMemoryUserStore,
   InMemoryAuthenticationStore,
 } from "../inMemoryStores";
-import { DeterministicIdGenerator } from "../../capability-0-admin/idGenerator";
+import { DeterministicIdGenerator } from "../../capability-0-admin/src/idGenerator";
 
 test("missing or malformed input is rejected", () => {
   const userStore = new InMemoryUserStore();
