@@ -7,6 +7,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      PHASE_2_ENABLED: "false"
 
     steps:
       - name: Checkout repository
