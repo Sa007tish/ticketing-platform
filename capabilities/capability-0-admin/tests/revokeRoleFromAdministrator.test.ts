@@ -1,54 +1,63 @@
 import { revokeRoleFromAdministrator } from "../src/revokeRoleFromAdministrator";
-import { AdminRole } from "../src/types";
 import {
   InMemoryAdministratorIdentityStore,
   InMemoryRoleAssignmentStore,
   InMemoryAuditLogStore,
   InMemoryProcessedRequestRegistry,
 } from "../src/inMemoryStores";
-import { DeterministicIdGenerator } from "../src/idGenerator";
+import { AdminRole } from "../src/types";
+
+const fixedNow = new Date("2025-01-01T00:00:00Z");
 
 describe("revokeRoleFromAdministrator", () => {
-  const now = new Date();
-
-  test("revokes AUDIT_ADMIN role successfully", () => {
+  it("revokes a role when invoked by an authorized admin", () => {
     const administratorStore = new InMemoryAdministratorIdentityStore();
-    const roleAssignmentStore = new InMemoryRoleAssignmentStore();
+    const roleStore = new InMemoryRoleAssignmentStore();
     const auditLogStore = new InMemoryAuditLogStore();
-    const processedRequestRegistry = new InMemoryProcessedRequestRegistry();
-    const idGenerator = new DeterministicIdGenerator();
+    const processedRegistry = new InMemoryProcessedRequestRegistry();
+
+    const idGenerator = { nextId: () => "audit-1" };
 
     administratorStore.create({
-      adminId: "admin-1",
-      createdAt: now,
-      isAttendee: false,
-      isOrganiser: false,
-      status: "ACTIVE",
+      adminId: "actor-admin",
+      createdAt: fixedNow,
     });
 
-    roleAssignmentStore.assign({
-      adminId: "admin-1",
-      role: AdminRole.AUDIT_ADMIN,
-      assignedAt: now,
-      assignedByAdminId: "system",
+    administratorStore.create({
+      adminId: "target-admin",
+      createdAt: fixedNow,
+    });
+
+    roleStore.assign({
+      adminId: "actor-admin",
+      role: AdminRole.SUPPORT_ADMIN,
+      assignedAt: fixedNow,
+      assignedByAdminId: "actor-admin",
+    });
+
+    roleStore.assign({
+      adminId: "target-admin",
+      role: AdminRole.SUPPORT_ADMIN,
+      assignedAt: fixedNow,
+      assignedByAdminId: "actor-admin",
     });
 
     revokeRoleFromAdministrator(
       administratorStore,
-      roleAssignmentStore,
+      roleStore,
       auditLogStore,
-      processedRequestRegistry,
+      processedRegistry,
       idGenerator,
-      "admin-1",
-      "admin-1",
-      AdminRole.AUDIT_ADMIN,
-      "cleanup",
-      "req-1",
-      now
+      "actor-admin",
+      "target-admin",
+      AdminRole.SUPPORT_ADMIN,
+      "No longer required",
+      "req-2",
+      fixedNow
     );
 
     expect(
-      roleAssignmentStore.getRolesForAdmin("admin-1").has(AdminRole.AUDIT_ADMIN)
+      roleStore.getRolesForAdmin("target-admin").has(AdminRole.SUPPORT_ADMIN)
     ).toBe(false);
 
     const logs = auditLogStore.readAll();
