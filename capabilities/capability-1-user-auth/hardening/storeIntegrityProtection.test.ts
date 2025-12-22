@@ -6,7 +6,7 @@ import {
   InMemoryUserStore,
   InMemoryAuthenticationStore,
 } from "../inMemoryStores";
-import { DeterministicIdGenerator } from "../../capability-0-admin/idGenerator";
+import { DeterministicIdGenerator } from "../../capability-0-admin/src/idGenerator";
 
 test("failed authentication does not mutate stores", () => {
   const now = new Date("2025-01-01T00:00:00Z");
