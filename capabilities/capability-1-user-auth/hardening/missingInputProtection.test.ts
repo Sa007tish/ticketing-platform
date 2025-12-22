@@ -7,7 +7,7 @@ import {
   InMemoryUserStore,
   InMemoryAuthenticationStore,
 } from "../inMemoryStores";
-import { DeterministicIdGenerator } from "../../capability-0-admin/src/idGenerator";
+import { DeterministicIdGenerator } from "../../capability-0-admin/idGenerator";
 
 test("missing or malformed input is rejected", () => {
   const userStore = new InMemoryUserStore();
@@ -18,19 +18,23 @@ test("missing or malformed input is rejected", () => {
     "id-3",
   ]);
 
-  // @ts-expect-error
-  expect(() => registerUser({}, userStore, idGenerator)).toThrow();
+  // Missing `now`
+  expect(() =>
+    registerUser({} as any, userStore, idGenerator)
+  ).toThrow();
 
-  // @ts-expect-error
+  // Missing `authenticationSecret`
   expect(() =>
     authenticateUser(
-      { userId: "u", now: new Date() },
+      { userId: "u", now: new Date() } as any,
       userStore,
       authenticationStore,
       idGenerator
     )
   ).toThrow();
 
-  // @ts-expect-error
-  expect(() => verifyAuthentication(undefined, authenticationStore)).toThrow();
+  // Invalid proof id
+  expect(() =>
+    verifyAuthentication(undefined as any, authenticationStore)
+  ).toThrow();
 });
