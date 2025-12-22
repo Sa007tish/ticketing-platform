@@ -18,8 +18,15 @@ export { DeterministicIdGenerator } from "./src/idGenerator";
 // Errors (Read-only)
 // =====================
 
+// capabilities/capability-0-admin/public.ts
+
 export {
+  Capability0Error,
   UnauthenticatedAdminError,
-  UnauthorizedAdminActionError,
-  ReplayDetectedAdminActionError,
+  UnauthorizedRoleAssignmentError,
+  InvalidRoleError,
+  MissingJustificationError,
+  TargetAdminNotFoundError,
+  LastAuditAdminRemovalError,
+  ReplayRequestDetectedError,
 } from "./src/errors";
