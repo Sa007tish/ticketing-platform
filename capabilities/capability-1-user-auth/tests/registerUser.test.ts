@@ -29,8 +29,6 @@ describe("registerUser", () => {
       userStore,
       idGenerator
     );
-
-    const result = registerUser(...);
     
     const generatedUserId = result.user.userId;
     expect(generatedUserId).toBeDefined();              // NEW (existence)
