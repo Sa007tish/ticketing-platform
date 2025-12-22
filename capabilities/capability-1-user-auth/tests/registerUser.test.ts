@@ -22,9 +22,7 @@ class TestUserStore implements UserStore {
 describe("registerUser", () => {
   test("Successful user registration — Identity stability & system-generated IDs", () => {
     const userStore = new TestUserStore();
-    const idGenerator = new DeterministicIdGenerator([
-      "user-1" as UserId,
-    ]);
+    const idGenerator = new DeterministicIdGenerator();
 
     const result = registerUser(
       { now: NOW },
@@ -42,10 +40,7 @@ describe("registerUser", () => {
 
   test("Multiple users can be registered — Multi-user support without collision", () => {
     const userStore = new TestUserStore();
-    const idGenerator = new DeterministicIdGenerator([
-      "user-1" as UserId,
-      "user-2" as UserId,
-    ]);
+    const idGenerator = new DeterministicIdGenerator();
 
     const r1 = registerUser({ now: NOW }, userStore, idGenerator);
     const r2 = registerUser({ now: NOW }, userStore, idGenerator);
