@@ -29,6 +29,8 @@ export type {
   ActorContext,
 } from "./src/types";
 
+export type { IdGenerator } from "./src/idGenerator";
+
 // =====================
 // Errors (Read-only)
 // =====================
