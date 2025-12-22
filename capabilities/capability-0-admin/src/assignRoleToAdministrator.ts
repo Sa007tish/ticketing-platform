@@ -17,7 +17,7 @@ import { IdGenerator } from "./idGenerator";
 
 /* ============================================================
  * Capability 0 — Assign Role to Administrator
- * (Mechanical template of createAdministratorAccount)
+ * (STRICT canonical structure)
  * ============================================================
  */
 
@@ -143,6 +143,7 @@ export function assignRoleToAdministrator(
 
   /* ------------------------------------------------------------
    * Authorization
+   * Actor must already hold the role they are assigning
    * ------------------------------------------------------------
    */
   const actorRoles = roleAssignmentStore.getRolesForAdmin(actorAdminId);
@@ -164,10 +165,10 @@ export function assignRoleToAdministrator(
   }
 
   /* ------------------------------------------------------------
-   * State mutation (domain change only)
+   * State mutation
    * ------------------------------------------------------------
    */
-  roleAssignmentStore.assignRole({
+  roleAssignmentStore.assign({
     adminId: targetAdminId,
     role,
     assignedAt: now,
