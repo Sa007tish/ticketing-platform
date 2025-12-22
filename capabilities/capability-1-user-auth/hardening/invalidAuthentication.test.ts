@@ -32,12 +32,12 @@ test("invalid authentication paths fail with correct errors", () => {
   ).toThrow(UserNotFoundError);
 
   // Existing user with wrong secret
-  const user = registerUser({ now }, userStore, idGenerator);
+  const registration = registerUser({ now }, userStore, idGenerator);
 
   expect(() =>
     authenticateUser(
       {
-        userId: user.userId,
+        userId: registration.user.userId,
         authenticationSecret: "incorrectSecret",
         now,
       },
@@ -50,8 +50,8 @@ test("invalid authentication paths fail with correct errors", () => {
   // Invalid proof verification
   const validProof = authenticateUser(
     {
-      userId: user.userId,
-      authenticationSecret: user.authenticationSecret,
+      userId: registration.user.userId,
+      authenticationSecret: registration.user.authenticationSecret,
       now,
     },
     userStore,
