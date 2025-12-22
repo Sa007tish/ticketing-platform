@@ -52,10 +52,7 @@ describe("authenticateUser", () => {
     const userStore = new TestUserStore();
     const authenticationStore = new TestAuthenticationStore();
 
-    const idGenerator = new DeterministicIdGenerator([
-      "user-1" as UserId,
-      "proof-1" as AuthenticationProofId,
-    ]);
+    const idGenerator = new DeterministicIdGenerator();
 
     const registration = registerUser(
       { now: NOW },
@@ -84,9 +81,7 @@ describe("authenticateUser", () => {
   test("Authentication fails for non-existent user — No implicit users", () => {
     const userStore = new TestUserStore();
     const authenticationStore = new TestAuthenticationStore();
-    const idGenerator = new DeterministicIdGenerator([
-      "proof-1" as AuthenticationProofId,
-    ]);
+    const idGenerator = new DeterministicIdGenerator();
 
     expect(() =>
       authenticateUser(
@@ -105,9 +100,7 @@ describe("authenticateUser", () => {
   test("Authentication fails with invalid secret — Authentication is not identity lookup", () => {
     const userStore = new TestUserStore();
     const authenticationStore = new TestAuthenticationStore();
-    const idGenerator = new DeterministicIdGenerator([
-      "user-1" as UserId,
-    ]);
+    const idGenerator = new DeterministicIdGenerator();
 
     const registration = registerUser(
       { now: NOW },
