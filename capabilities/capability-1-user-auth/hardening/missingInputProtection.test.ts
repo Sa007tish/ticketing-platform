@@ -12,11 +12,7 @@ import { DeterministicIdGenerator } from "../../capability-0-admin/src/idGenerat
 test("missing or malformed input is rejected", () => {
   const userStore = new InMemoryUserStore();
   const authenticationStore = new InMemoryAuthenticationStore();
-  const idGenerator = new DeterministicIdGenerator([
-    "id-1",
-    "id-2",
-    "id-3",
-  ]);
+  const idGenerator = new DeterministicIdGenerator(); // ✅ fixed
 
   // Missing `now`
   expect(() =>
