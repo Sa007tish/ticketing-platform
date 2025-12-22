@@ -14,18 +14,14 @@ test("verifyAuthentication is idempotent and replay does not mutate state", () =
 
   const userStore = new InMemoryUserStore();
   const authenticationStore = new InMemoryAuthenticationStore();
-  const idGenerator = new DeterministicIdGenerator([
-    "id-1",
-    "id-2",
-    "id-3",
-  ]);
+  const idGenerator = new DeterministicIdGenerator(); // ✅ fixed
 
-  const user = registerUser({ now }, userStore, idGenerator);
+  const registration = registerUser({ now }, userStore, idGenerator);
 
   const proof = authenticateUser(
     {
-      userId: user.userId,
-      authenticationSecret: user.authenticationSecret,
+      userId: registration.user.userId,                 // ✅ fixed
+      authenticationSecret: registration.user.authenticationSecret,
       now,
     },
     userStore,
