@@ -144,6 +144,7 @@ export function revokeRoleFromAdministrator(
 
   /* ------------------------------------------------------------
    * Authorization
+   * Actor must hold the role they revoke
    * ------------------------------------------------------------
    */
   const actorRoles = roleAssignmentStore.getRolesForAdmin(actorAdminId);
@@ -165,51 +166,34 @@ export function revokeRoleFromAdministrator(
   }
 
   /* ------------------------------------------------------------
-   * Invariant: last AUDIT_ADMIN must not be revoked
-   *
-   * NOTE (documented limitation):
-   * RoleAssignmentStore does not expose role-centric enumeration.
-   * To correctly enforce the invariant without changing interfaces,
-   * we conservatively enumerate administrators and count current
-   * AUDIT_ADMIN holders via getRolesForAdmin(adminId).
-   *
-   * This enumeration is acceptable ONLY within Capability 0
-   * governance code to preserve correctness over abstraction purity.
+   * Last AUDIT_ADMIN invariant
    * ------------------------------------------------------------
    */
-  if (role === AdminRole.AUDIT_ADMIN) {
-    let auditAdminCount = 0;
+  if (
+    role === AdminRole.AUDIT_ADMIN &&
+    roleAssignmentStore.countAdminsWithRole(AdminRole.AUDIT_ADMIN) === 1
+  ) {
+    auditLogStore.append({
+      auditId: idGenerator.nextId(),
+      timestamp: now,
+      actorAdminId,
+      action: "REVOKE_ROLE",
+      targetAdminId,
+      justification,
+      outcome: "FAILURE",
+      failureReason: "LAST_AUDIT_ADMIN_REMOVAL",
+      requestId,
+    });
 
-    for (const admin of administratorStore.getAll()) {
-      const roles = roleAssignmentStore.getRolesForAdmin(admin.adminId);
-      if (roles.has(AdminRole.AUDIT_ADMIN)) {
-        auditAdminCount++;
-      }
-    }
-
-    if (auditAdminCount === 1) {
-      auditLogStore.append({
-        auditId: idGenerator.nextId(),
-        timestamp: now,
-        actorAdminId,
-        action: "REVOKE_ROLE",
-        targetAdminId,
-        justification,
-        outcome: "FAILURE",
-        failureReason: "LAST_AUDIT_ADMIN_REMOVAL",
-        requestId,
-      });
-
-      processedRequestRegistry.record({ requestId, processedAt: now });
-      throw new LastAuditAdminRemovalError();
-    }
+    processedRequestRegistry.record({ requestId, processedAt: now });
+    throw new LastAuditAdminRemovalError();
   }
 
   /* ------------------------------------------------------------
    * State mutation
    * ------------------------------------------------------------
    */
-  roleAssignmentStore.removeRole(targetAdminId, role);
+  roleAssignmentStore.revoke(targetAdminId, role);
 
   /* ------------------------------------------------------------
    * Audit log — SUCCESS
