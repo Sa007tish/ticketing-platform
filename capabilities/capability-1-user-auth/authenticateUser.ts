@@ -6,7 +6,7 @@ import {
   UserId,
 } from "./types";
 import { UserStore, AuthenticationStore } from "./stores";
-import { IdGenerator } from "../capability-0-admin/src/idGenerator";
+import { IdGenerator } from "../capability-0-admin/public";
 import {
   UserNotFoundError,
   InvalidAuthenticationError,
