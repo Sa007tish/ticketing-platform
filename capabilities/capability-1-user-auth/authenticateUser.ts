@@ -4,10 +4,13 @@ import {
   AuthenticationProof,
   AuthenticationSecret,
   UserId,
-  AuthenticationProofId
 } from "./types";
 import { UserStore, AuthenticationStore } from "./stores";
-import { IdGenerator } from "../capability-0-admin/idGenerator";
+import { IdGenerator } from "../../capability-0-admin/idGenerator";
+import {
+  UserNotFoundError,
+  InvalidAuthenticationError,
+} from "./errors";
 
 export interface AuthenticateUserInput {
   userId: UserId;
@@ -20,4 +23,24 @@ export function authenticateUser(
   userStore: UserStore,
   authenticationStore: AuthenticationStore,
   idGenerator: IdGenerator
-): AuthenticationProof;
+): AuthenticationProof {
+  const user = userStore.getById(input.userId);
+
+  if (!user) {
+    throw new UserNotFoundError();
+  }
+
+  if (user.authenticationSecret !== input.authenticationSecret) {
+    throw new InvalidAuthenticationError();
+  }
+
+  const proof: AuthenticationProof = {
+    proofId: idGenerator.nextId(),
+    userId: user.userId,
+    issuedAt: input.now,
+  };
+
+  authenticationStore.save(proof);
+
+  return proof;
+}
