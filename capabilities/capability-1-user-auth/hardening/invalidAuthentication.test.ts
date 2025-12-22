@@ -15,12 +15,7 @@ test("invalid authentication paths fail with correct errors", () => {
 
   const userStore = new InMemoryUserStore();
   const authenticationStore = new InMemoryAuthenticationStore();
-  const idGenerator = new DeterministicIdGenerator([
-    "id-1",
-    "id-2",
-    "id-3",
-    "id-4",
-  ]);
+  const idGenerator = new DeterministicIdGenerator();
 
   // Non-existent user
   expect(() =>
