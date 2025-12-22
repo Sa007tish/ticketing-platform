@@ -7,7 +7,7 @@ import {
   InMemoryUserStore,
   InMemoryAuthenticationStore,
 } from "../inMemoryStores";
-import { DeterministicIdGenerator } from "../../capability-0-admin/src/idGenerator";
+import { DeterministicIdGenerator } from "../../capability-0-admin/public";
 import { UserNotFoundError, InvalidAuthenticationError } from "../errors";
 
 test("invalid authentication paths fail with correct errors", () => {
