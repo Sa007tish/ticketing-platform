@@ -18,15 +18,14 @@ export function registerUser(
   userStore: UserStore,
   idGenerator: IdGenerator
 ): RegisterUserResult {
-  const userId = idGenerator.nextId();
+  const userId = idGenerator.nextId() as UserId;
 
   const authenticationSecret = `secret-${userId}`;
 
   const user: User = {
-    userId,
-    createdAt: input.now,
-    authenticationSecret,
-  };
+  userId,
+  createdAt: input.now,
+};
 
   userStore.create(user);
 
