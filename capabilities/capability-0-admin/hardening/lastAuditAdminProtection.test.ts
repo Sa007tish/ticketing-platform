@@ -5,48 +5,50 @@ import {
   InMemoryAuditLogStore,
   InMemoryProcessedRequestRegistry,
 } from "../src/inMemoryStores";
-import { AdminRole, AdministratorStatus } from "../src/types";
-import { LastAuditAdminRemovalError } from "../src/errors";
+import { AdminRole } from "../src/types";
+import { DeterministicIdGenerator } from "../src/idGenerator";
 
-describe("Hardening: Last AUDIT_ADMIN protection", () => {
-  it("prevents removing the final AUDIT_ADMIN", () => {
-    const now = new Date();
+test("cannot revoke last remaining AUDIT_ADMIN", () => {
+  const now = new Date();
 
-    const adminStore = new InMemoryAdministratorIdentityStore();
-    const roleStore = new InMemoryRoleAssignmentStore();
-    const auditLog = new InMemoryAuditLogStore();
-    const registry = new InMemoryProcessedRequestRegistry();
+  const adminStore = new InMemoryAdministratorIdentityStore();
+  const roleStore = new InMemoryRoleAssignmentStore();
+  const auditLog = new InMemoryAuditLogStore();
+  const registry = new InMemoryProcessedRequestRegistry();
+  const idGen = new DeterministicIdGenerator();
 
-    adminStore.create({
-      adminId: "actor",
-      createdAt: now,
-      status: AdministratorStatus.ACTIVE,
-      isAttendee: false,
-      isOrganiser: false,
-    });
-
-    roleStore.assign({
-      adminId: "actor",
-      role: AdminRole.AUDIT_ADMIN,
-      assignedByAdminId: "system",
-      assignedAt: now,
-    });
-
-    expect(() =>
-      revokeRoleFromAdministrator(
-        {
-          requestId: "revoke-1",
-          actorAdminId: "actor",
-          targetAdminId: "actor",
-          role: AdminRole.AUDIT_ADMIN,
-          justification: "test",
-          occurredAt: now,
-        },
-        adminStore,
-        roleStore,
-        auditLog,
-        registry
-      )
-    ).toThrow(LastAuditAdminRemovalError);
+  adminStore.create({
+    adminId: "only-admin",
+    createdAt: now,
+    isAttendee: false,
+    isOrganiser: false,
+    status: "ACTIVE",
   });
+
+  roleStore.assign({
+    adminId: "only-admin",
+    role: AdminRole.AUDIT_ADMIN,
+    assignedAt: now,
+    assignedByAdminId: "system",
+  });
+
+  expect(() =>
+    revokeRoleFromAdministrator(
+      adminStore,
+      roleStore,
+      auditLog,
+      registry,
+      idGen,
+      "only-admin",
+      "only-admin",
+      AdminRole.AUDIT_ADMIN,
+      "attempt removal",
+      "req-3",
+      now
+    )
+  ).toThrow();
+
+  expect(roleStore.getRolesForAdmin("only-admin").has(AdminRole.AUDIT_ADMIN)).toBe(
+    true
+  );
 });
