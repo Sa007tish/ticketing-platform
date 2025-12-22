@@ -7,4 +7,12 @@ import { InvalidAuthenticationError } from "./errors";
 export function verifyAuthentication(
   proofId: string,
   authenticationStore: AuthenticationStore
-): AuthenticationProof;
+): AuthenticationProof {
+  const proof = authenticationStore.getByProofId(proofId);
+
+  if (!proof) {
+    throw new InvalidAuthenticationError();
+  }
+
+  return proof;
+}
