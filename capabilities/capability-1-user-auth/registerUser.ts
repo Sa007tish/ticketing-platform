@@ -12,7 +12,7 @@ export function registerUser(
   input: RegisterUserInput,
   userStore: UserStore,
   idGenerator: IdGenerator
-): RegisterUserResult {
+): User {
   const userId = idGenerator.nextId();
 
   const authenticationSecret = `secret-${userId}`;
