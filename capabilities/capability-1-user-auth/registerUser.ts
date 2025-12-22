@@ -8,11 +8,6 @@ export interface RegisterUserInput {
   now: Date;
 }
 
-export interface RegisterUserResult {
-  user: User;
-  authenticationSecret: string;
-}
-
 export function registerUser(
   input: RegisterUserInput,
   userStore: UserStore,
