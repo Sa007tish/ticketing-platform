@@ -9,3 +9,4 @@ Interfaces are frozen.
 Implementation follows canonical tests.
 
 chore(capability-1): freeze Phase 1B canonical tests
+chore(capability-1): freeze Phase 1C implementation
