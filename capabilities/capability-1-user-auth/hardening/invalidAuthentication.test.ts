@@ -7,7 +7,7 @@ import {
   InMemoryUserStore,
   InMemoryAuthenticationStore,
 } from "../inMemoryStores";
-import { DeterministicIdGenerator } from "../../capability-0-admin/src/idGenerator";
+import { DeterministicIdGenerator } from "../../capability-0-admin/idGenerator";
 import { UserNotFoundError, InvalidAuthenticationError } from "../errors";
 
 test("invalid authentication paths fail with correct errors", () => {
@@ -22,6 +22,7 @@ test("invalid authentication paths fail with correct errors", () => {
     "id-4",
   ]);
 
+  // Non-existent user
   expect(() =>
     authenticateUser(
       {
@@ -35,6 +36,7 @@ test("invalid authentication paths fail with correct errors", () => {
     )
   ).toThrow(UserNotFoundError);
 
+  // Existing user with wrong secret
   const user = registerUser({ now }, userStore, idGenerator);
 
   expect(() =>
@@ -50,6 +52,7 @@ test("invalid authentication paths fail with correct errors", () => {
     )
   ).toThrow(InvalidAuthenticationError);
 
+  // Invalid proof verification
   const validProof = authenticateUser(
     {
       userId: user.userId,
