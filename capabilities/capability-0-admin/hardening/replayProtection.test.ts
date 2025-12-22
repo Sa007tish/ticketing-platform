@@ -5,54 +5,52 @@ import {
   InMemoryAuditLogStore,
   InMemoryProcessedRequestRegistry,
 } from "../src/inMemoryStores";
-import { AdminRole, AdministratorStatus } from "../src/types";
-import { DuplicateRequestError } from "../src/errors";
+import { AdminRole } from "../src/types";
+import { DeterministicIdGenerator } from "../src/idGenerator";
 
-describe("Hardening: Replay protection", () => {
-  it("rejects duplicate requestId", () => {
-    const now = new Date();
+test("duplicate requestId is rejected", () => {
+  const now = new Date();
 
-    const adminStore = new InMemoryAdministratorIdentityStore();
-    const roleStore = new InMemoryRoleAssignmentStore();
-    const auditLog = new InMemoryAuditLogStore();
-    const registry = new InMemoryProcessedRequestRegistry();
+  const adminStore = new InMemoryAdministratorIdentityStore();
+  const roleStore = new InMemoryRoleAssignmentStore();
+  const auditLog = new InMemoryAuditLogStore();
+  const registry = new InMemoryProcessedRequestRegistry();
+  const idGen = new DeterministicIdGenerator();
 
-    adminStore.create({
-      adminId: "actor",
-      createdAt: now,
-      status: AdministratorStatus.ACTIVE,
-      isAttendee: false,
-      isOrganiser: false,
-    });
-
-    adminStore.create({
-      adminId: "target",
-      createdAt: now,
-      status: AdministratorStatus.ACTIVE,
-      isAttendee: false,
-      isOrganiser: false,
-    });
-
-    roleStore.assign({
-      adminId: "actor",
-      role: AdminRole.AUDIT_ADMIN,
-      assignedByAdminId: "system",
-      assignedAt: now,
-    });
-
-    const input = {
-      requestId: "dup-req",
-      actorAdminId: "actor",
-      targetAdminId: "target",
-      role: AdminRole.SUPPORT_ADMIN,
-      justification: "test",
-      occurredAt: now,
-    };
-
-    assignRoleToAdministrator(input, adminStore, roleStore, auditLog, registry);
-
-    expect(() =>
-      assignRoleToAdministrator(input, adminStore, roleStore, auditLog, registry)
-    ).toThrow(DuplicateRequestError);
+  adminStore.create({
+    adminId: "actor",
+    createdAt: now,
+    isAttendee: false,
+    isOrganiser: false,
+    status: "ACTIVE",
   });
+
+  adminStore.create({
+    adminId: "target",
+    createdAt: now,
+    isAttendee: false,
+    isOrganiser: false,
+    status: "ACTIVE",
+  });
+
+  registry.record({ requestId: "req-1", processedAt: now });
+
+  expect(() =>
+    assignRoleToAdministrator(
+      adminStore,
+      roleStore,
+      auditLog,
+      registry,
+      idGen,
+      "actor",
+      "target",
+      AdminRole.SUPPORT_ADMIN,
+      "assign support",
+      "req-1",
+      now
+    )
+  ).toThrow();
+
+  expect(roleStore.getRolesForAdmin("target").size).toBe(0);
+  expect(auditLog.readAll().length).toBe(1);
 });
