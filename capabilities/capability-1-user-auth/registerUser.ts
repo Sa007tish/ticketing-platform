@@ -2,7 +2,7 @@
 
 import { User, UserId } from "./types";
 import { UserStore } from "./stores";
-import { IdGenerator } from "../capability-0-admin/src/idGenerator";
+import { IdGenerator } from "../capability-0-admin/public";
 
 export interface RegisterUserInput {
   now: Date;
