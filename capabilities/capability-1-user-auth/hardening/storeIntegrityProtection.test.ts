@@ -6,7 +6,7 @@ import {
   InMemoryUserStore,
   InMemoryAuthenticationStore,
 } from "../inMemoryStores";
-import { DeterministicIdGenerator } from "../../capability-0-admin/src/idGenerator";
+import { DeterministicIdGenerator } from "../../capability-0-admin/idGenerator";
 
 test("failed authentication does not mutate stores", () => {
   const now = new Date("2025-01-01T00:00:00Z");
@@ -34,9 +34,8 @@ test("failed authentication does not mutate stores", () => {
     )
   ).toThrow();
 
+  // store must remain untouched after failed authentication
   expect(
-    authenticationStore.getByProofId(
-      (undefined as unknown) as string
-    )
+    authenticationStore.getByProofId("non-existent-proof-id")
   ).toBeUndefined();
 });
