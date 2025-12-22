@@ -8,7 +8,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
-      PHASE_2_ENABLED: "false"
+      PHASE_2_ENABLED: "true"
 
     steps:
       - name: Checkout repository
