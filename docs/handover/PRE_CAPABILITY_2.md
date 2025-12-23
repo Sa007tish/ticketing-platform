@@ -84,6 +84,11 @@ The successor AI is authorized to:
 
 All work must respect frozen artifacts and constitutional rules.
 
+All work must comply with decisions and deferrals recorded in:
+- ARCHITECTURAL_DECISION_INDEX.md
+- CORE_VS_PERIMETER.md
+- DEFERRED_BUT_MANDATORY.md
+
 The approved MVP capability scope is recorded in /docs/governance/MVP_CAPABILITY_SCOPE.md.
 
 ---
