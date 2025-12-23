@@ -35,15 +35,20 @@ architecture, you **must** read the authoritative documents listed below.
    `docs/governance/SYSTEM_CONSTITUTION.md`  
    Immutable governance rules and global invariants.
 
-2. **Capability READMEs**  
+2. **Operational Governance (STOP CONDITIONS & AI Onboarding)**  
+   - `docs/governance/STOP_CONDITIONS.md`  
+   - `docs/handover/AI_ONBOARDING_PROTOCOL.md`  
+   Defines mandatory halting conditions and AI operating rules.
+
+3. **Capability READMEs**  
    Located inside each capability directory.  
    Define purpose, powers, invariants, and frozen surfaces.
 
-3. **Phase & Handover Documents**  
+4. **Phase & Handover Documents**  
    Located in `docs/architecture/` and `docs/handover/`.  
    Capture executed reality and authorized next steps.
 
-4. **This README**  
+5. **This README**  
    Entry point and navigation aid only.
 
 If any document or code conflicts with the System Constitution,
