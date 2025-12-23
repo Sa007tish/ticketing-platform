@@ -84,6 +84,8 @@ The successor AI is authorized to:
 
 All work must respect frozen artifacts and constitutional rules.
 
+The approved MVP capability scope is recorded in /docs/governance/MVP_CAPABILITY_SCOPE.md.
+
 ---
 
 ## 6. NOT AUTHORIZED
