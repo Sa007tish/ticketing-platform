@@ -40,15 +40,21 @@ architecture, you **must** read the authoritative documents listed below.
    - `docs/handover/AI_ONBOARDING_PROTOCOL.md`  
    Defines mandatory halting conditions and AI operating rules.
 
-3. **Capability READMEs**  
+3. **Architectural Control Plane**
+   - `docs/architecture/ARCHITECTURAL_DECISION_INDEX.md`
+   - `docs/architecture/CORE_VS_PERIMETER.md`
+   - `docs/architecture/DEFERRED_BUT_MANDATORY.md`
+   Defines irreversible decisions, classification rules, and deferred obligations.
+
+4. **Capability READMEs**  
    Located inside each capability directory.  
    Define purpose, powers, invariants, and frozen surfaces.
 
-4. **Phase & Handover Documents**  
+5. **Phase & Handover Documents**  
    Located in `docs/architecture/` and `docs/handover/`.  
    Capture executed reality and authorized next steps.
 
-5. **This README**  
+6. **This README**  
    Entry point and navigation aid only.
 
 If any document or code conflicts with the System Constitution,
