@@ -55,6 +55,12 @@ An AI must:
 - Obey STOP CONDITIONS without exception
 - Assume AI-written code is untrusted until reviewed
 
+An AI must also:
+
+- Read the Architectural Decision Index
+- Respect Core vs Perimeter classification
+- Treat Deferred-but-Mandatory items as binding future obligations
+
 An AI must never:
 
 - Infer interfaces
