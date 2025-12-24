@@ -100,4 +100,17 @@ Silence or omission does not imply permission.
 
 ---
 
+## Explicitly Unsupported Capabilities (Current)
+
+The system explicitly does NOT support:
+
+- Semi-trusted domains
+- Local authority capabilities
+- Delegated authority
+- Horizontal scalability of trust
+
+These constraints are intentional and binding.
+Any future change requires explicit architectural amendment.
+
+
 **End of Core vs Perimeter Doctrine**
