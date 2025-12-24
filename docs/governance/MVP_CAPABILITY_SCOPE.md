@@ -174,6 +174,50 @@ Changes to this document require:
 This document may evolve,
 but only through **deliberate governance action**.
 
+## Deferred but Mandatory Capabilities
+
+The following capabilities are intentionally excluded from the MVP.
+Their absence is deliberate and scoped, not accidental.
+
+Any future work that introduces payments, refunds, disputes, multi-actor workflows,
+or cross-domain state coordination MUST revisit this section before implementation.
+
+### 1. Composition / Policy Authority
+- Status: Deferred
+- Rationale:
+  The MVP does not yet include sufficient cross-domain interactions to justify a
+  dedicated composition authority.
+- Responsibility (when introduced):
+  - Own cross-capability invariants
+  - Define precedence rules between capabilities
+  - Define forbidden compositions
+- Risk if ignored:
+  Cross-capability logic will drift into domain capabilities, eroding authority
+  boundaries and auditability.
+
+### 2. Ledger / Event Authority
+- Status: Deferred
+- Rationale:
+  The MVP explicitly excludes payments, refunds, chargebacks, and reconciliation.
+- Responsibility (when introduced):
+  - Domain-independent event recording
+  - Financial state reconstruction
+  - Temporal ordering guarantees
+- Risk if ignored:
+  Financial state becomes non-replayable and legally indefensible.
+
+### 3. Delegated Authority
+- Status: Deferred (Conditional)
+- Rationale:
+  The MVP operates under a single sovereign authority model.
+- Responsibility (when introduced):
+  - Grant scoped, revocable authority
+  - Enforce bounded mutation rights
+- Risk if ignored:
+  Introducing roles (vendors, operators, refund agents) will require architectural
+  rewrites rather than extensions.
+
+
 ---
 
 **End of MVP Capability Scope**
